@@ -1,4 +1,7 @@
-//importo sita posts da posts.js
+//importo il file di connessione al db
+const connection = require('../data/db')
+
+//importo sita posts da posts.js (per il momento lo mantengo assieme al file connessione db)
 const listaPosts = require('../data/postsList')
 
 function index(req, res) {
