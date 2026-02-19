@@ -16,19 +16,15 @@ function index(req, res) {
 }
 
 function show(req, res) {
-    //rendo utilizzabile singolo post usando id
-    const postById = parseInt(req.params.id) //uso parse int perche req.params.id mi sertitusce una stringa e io ho bisogna di un numero per rendere vera l'uguaglianza stretta (non ci sarei mai arrivato da solo!)
-    //cerco post specifico usando metodo 'find' e usando id specifico recuerparo con req.params.id
-    const myPost = listaPosts.find((post) => post.id === postById) //sintasssi meootdo find copiata da mdn
-    if (!myPost) { //SE  myPost non esiste NOT ritorna messaggio di errore
-        return res.status(404).json({
-            error: 'not found - errore 404',
-            message: 'prodotto non trovato'
-        });
-    }
-    res.json(myPost);
+    // recuperiamo l'id dall' URL
+    const id = req.params.id
+    const sql = 'SELECT * FROM posts WHERE id = ?';
+    connection.query(sql, [id], (err, results) => {
+        if (err) return res.status(500).json({ error: 'Database query failed' });
+        if (results.length === 0) return res.status(404).json({ error: 'post not found' });
+        res.json(results[0]);
+    });
 }
-
 function store(req, res) {
     //creo id univoco usado metodo date e gli attuali milliscondi a partire dal 1 gennaio 1970
     const newId = Date.now();
