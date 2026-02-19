@@ -4,18 +4,15 @@ const connection = require('../data/db')
 //importo sita posts da posts.js (per il momento lo mantengo assieme al file connessione db)
 const listaPosts = require('../data/postsList')
 
+// Index
 function index(req, res) {
-
-    //var let la lista post dopo la ricerca é unguale a quella originale all'inizio
-    let serchedList = listaPosts;
-    // Se la richiesta contiene un filtro, allora filtriamo il menu
-    if (req.query.tags) {
-        serchedList = listaPosts.filter(
-            post => post.tags.includes(req.query.tags)
-        );
-    }
-
-    res.json({ numeroPosts: serchedList.length, serchedList });
+    // prepariamo la query
+    const sql = 'SELECT * FROM posts';
+    // eseguiamo la query!
+    connection.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Database query failed' });
+        res.json(results);
+    });
 }
 
 function show(req, res) {
