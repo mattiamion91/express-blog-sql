@@ -115,25 +115,13 @@ function modify(req, res) {
 }
 
 function destroy(req, res) {
-    //recupero l'id dall'URL e lo trasformo in un numero
-    const id = parseInt(req.params.id)
-    //metodo find per trovare il post usando id
-    const post = listaPosts.find((pst) => pst.id === id)
-    //valido che il post esista
-    if (!post) {
-        return res.status(404).json({
-            error: 'not found - errore 404',
-            message: 'prodotto non trovato'
-        });
-    }
-    //rimuovo post con metodo splice 
-    listaPosts.splice(listaPosts.indexOf(post), 1);
-    //stampo nel terminale la lista aggiornata
-    console.log(listaPosts);
-    // forziamo status secondo convenzioni REST che chiude anche function
-    res.sendStatus(204)
-
-    //res.send('Eliminazione del post ' + req.params.id);
+    // recuperiamo l'id dall' URL
+    const { id } = req.params;
+    //Eliminiamo il post dal menu
+    connection.query('DELETE FROM posts WHERE id = ?', [id], (err) => {
+        if (err) return res.status(500).json({ error: 'Failed to delete posts' });
+        res.sendStatus(204)
+    });
 }
 // esportiamo tutto
 module.exports = { index, show, store, update, modify, destroy }
