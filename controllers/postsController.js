@@ -18,11 +18,21 @@ function index(req, res) {
 function show(req, res) {
     // recuperiamo l'id dall' URL
     const id = req.params.id
-    const sql = 'SELECT * FROM posts WHERE id = ?';
-    connection.query(sql, [id], (err, results) => {
+    const postSql = 'SELECT * FROM posts WHERE id = ?';
+    const tagsSql = `SELECT T.* FROM tags T JOIN post_tag PT ON T.id = PT.tag_id WHERE PT.post_id = ?`;
+    // Eseguiamo la prima query per la pizza
+    connection.query(postSql, [id], (err, postResults) => {
         if (err) return res.status(500).json({ error: 'Database query failed' });
-        if (results.length === 0) return res.status(404).json({ error: 'post not found' });
-        res.json(results[0]);
+        if (postResults.length === 0) return res.status(404).json({ error: 'Pizza not found' });
+        // Recuperiamo la pizza
+        const post = postResults[0];
+        // Se è andata bene, eseguiamo la seconda query per gli ingredienti
+        connection.query(tagsSql, [id], (err, tagsResults) => {
+            if (err) return res.status(500).json({ error: 'Database query failed' });
+            // Aggoiungiamo gli ingredienti alla pizza
+            post.tags = tagsResults;
+            res.json(post);
+        });
     });
 }
 function store(req, res) {
